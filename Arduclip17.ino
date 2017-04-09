@@ -26,6 +26,14 @@ double AmpsL = 0;
 double AmpsR = 0;
 double AmpsC = 0;
 
+// HC-SR04 distance sensor
+#define echoPin 7 // Echo Pin     // CHECK THIS
+#define trigPin 8 // Trigger Pin
+#define LEDPin 13 // Onboard LED
+int maximumRange = 200; // Maximum range needed
+int minimumRange = 0; // Minimum range needed
+long duration, distance; // Duration used to calculate distance
+
 // Measure battery voltage
 int battv;  // Holds battery voltage value
 int batteryVoltage;
@@ -50,6 +58,10 @@ void setup() {
 
   // Drive motors off
   driveStop();
+
+  // Distance sensor
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
   // Battery voltage
   pinMode(voltsens, INPUT);
