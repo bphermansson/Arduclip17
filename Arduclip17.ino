@@ -11,14 +11,20 @@ int enB = 9;
 int in3 = 8;
 int in4 = 10;
 
-int speed = 150;
+// Initial drive motor speed
+int driveSpeed = 150;
 
-// Motor driver current sensor, used to determin load on drive wheels
-int loadL;
-int loadR;
-// A0 and A1 reads the values
-#define loadPinL 0
-#define loadPinR 1
+// ACS712 for measuring motor current
+const int analogCutmotor = A0;
+const int analogDrivemotorL = A1; // Check this!!!
+const int analogDrivemotorR = A2;
+int mVperAmp = 185; // use 100 for 20A Module and 66 for 30A Module
+int RawValue= 0;
+int ACSoffset = 2500; 
+double Voltage = 0;
+double AmpsL = 0;
+double AmpsR = 0;
+double AmpsC = 0;
 
 // Measure battery voltage
 int battv;  // Holds battery voltage value
@@ -54,8 +60,8 @@ void setup() {
   
   // Initial motor test
   // Set drive motor speed
-  analogWrite(enA, speed);
-  analogWrite(enB, speed);
+  analogWrite(enA, driveSpeed);
+  analogWrite(enB, driveSpeed);
   //driveMotors();
 }
 
@@ -63,6 +69,13 @@ void loop() {
   // checks if thread should run
   if(battThread.shouldRun())
     battThread.run();
+
+  // Check current
+  currentCheck();
+
+  // Are we close to something?
+  distanceFront();
+   
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
       String serInput = Serial.readStringUntil("\n");
@@ -76,24 +89,26 @@ void loop() {
         //Serial.println(command);
         
         if (command=="1") {
-          Serial.print ("Forward");
+          Serial.println ("Forward");
           driveForward();
         }
         else if (command=="2") {
-          Serial.print ("Reverse");
+          Serial.println ("Reverse");
           driveBackward();
         }
         else if (command=="3") {
-          Serial.print ("Stop");
+          Serial.println ("Stop");
           driveStop();
         }
         else if (command=="4") {
-          Serial.print ("Set speed!");  
-          speed = serInput.substring(1).toInt();
-          Serial.print("New speed: ");
-          Serial.print(speed);  
+          Serial.println ("Set drive speed!");  
+          driveSpeed = serInput.substring(1).toInt();
+          Serial.print("New drive speed: ");
+          Serial.print(driveSpeed);  
+          analogWrite(enA, driveSpeed);
+          analogWrite(enB, driveSpeed);
         }
         
-      //}
+      
   }
 }
