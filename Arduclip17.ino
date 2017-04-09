@@ -91,9 +91,6 @@ void loop() {
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
       String serInput = Serial.readStringUntil("\n");
-      Serial.println("Got serial data");
-      // look for the newline. That's the end of your sentence:
-      //if (Serial.read() == '\n') {
         Serial.print("Got: ");
         Serial.println(serInput);
         // The first char is the command. This can be followed by a value
@@ -119,8 +116,6 @@ void loop() {
           Serial.print(driveSpeed);  
           analogWrite(enA, driveSpeed);
           analogWrite(enB, driveSpeed);
-        }
-        
-      
-  }
+        }  
+    }
 }
