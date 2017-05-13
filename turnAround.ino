@@ -1,4 +1,5 @@
 void turnAround() {
+  Serial.println("Turn around");
   int oldSpeed = driveSpeed;
   
   // Set speed
@@ -31,4 +32,3 @@ void turnAround() {
   analogWrite(enA, driveSpeed);
   analogWrite(enB, driveSpeed);
 }
-

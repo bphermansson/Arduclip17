@@ -1,16 +1,22 @@
-void currentCheck(){
+int currentCheck(){
  // Left motor
  RawValue = analogRead(analogDrivemotorL);
+ Serial.print("Adc analogDrivemotorL: ");
+ Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsL = ((Voltage - ACSoffset) / mVperAmp);
  delay(100);
  // Right motor
  RawValue = analogRead(analogDrivemotorR);
+ Serial.print("Adc analogDrivemotorR: ");
+ Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsR = ((Voltage - ACSoffset) / mVperAmp);
  delay(100);
  // Cutter motor
  RawValue = analogRead(analogCutmotor);
+ Serial.print("Adc analogCutmotor: ");
+ Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsC = ((Voltage - ACSoffset) / mVperAmp);
  delay(100);
