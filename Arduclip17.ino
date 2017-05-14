@@ -1,9 +1,18 @@
+/* Red led for error indication
+ * Check value for batt low
+ * 
+ * 
+ */
+
+
 #include <Thread.h>   // Timing functions
 Thread battThread = Thread();
 
 // Prototypes
 int batt();
-int currentCheck();
+int currentCheckLM();
+int currentCheckRM();
+int currentCheckCM();
 int distanceFront();
 void turnAround();
 void driveForward();
@@ -44,7 +53,6 @@ double AmpsC = 0;
 // HC-SR04 distance sensor
 int echoPin = 11; // Echo Pin     
 int trigPin = 12; // Trigger Pin
-int LEDPin = 13; // Onboard LED
 int maximumRange = 200; // Maximum range needed
 int minimumRange = 0; // Minimum range needed
 long duration, distance; // Duration used to calculate distance
@@ -57,6 +65,9 @@ int voltsens = 3;
 float vPow = 5.02; // Voltage at the Arduinos Vcc and Vref. 
 int r1 = 11000;  // "Top" resistor, 11k (10+1)
 int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm. 
+
+int LEDPin = 13; // Onboard LED
+int redLed = 0; // CHECK THIS
 
 void setup() {
   Serial.begin (9600);
@@ -100,7 +111,11 @@ void loop() {
     battThread.run();
 
   // Check current
-  int current = currentCheck();
+  int currentLM = currentCheckLM();
+  int currentRM = currentCheckRM();
+  int currentCM = currentCheckCM();
+
+  
 
   // Are we close to something?
   int distance = distanceFront();
@@ -114,6 +129,13 @@ void loop() {
   Serial.print ("B: ");
   Serial.print(battv);
   Serial.println("V (in main)");
+  
+  if (battv < 23) {
+        driveStop();
+        analogWrite(dc, 255);   // Cutter off
+        Serial.println("Batt low, power off");
+        
+  }
    
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
@@ -149,7 +171,7 @@ void loop() {
           analogWrite(dc, 0);
         }
         else if (command=="6") {
-          Serial.print("Cutter off");
+          Serial.println("Cutter off");
           analogWrite(dc, 255);
         }
   }
