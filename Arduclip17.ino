@@ -115,7 +115,12 @@ void loop() {
   int currentRM = currentCheckRM();
   int currentCM = currentCheckCM();
 
-  
+  if (currentLM > 2 || currentRM > 2 || currentCM > 2){
+        driveStop();
+        analogWrite(dc, 255);   // Cutter off
+        
+        Serial.println("Current high, power off");
+  }
 
   // Are we close to something?
   int distance = distanceFront();
