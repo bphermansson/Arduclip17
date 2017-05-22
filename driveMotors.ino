@@ -17,12 +17,12 @@
   digitalWrite(in2, LOW);  
   */
   // L motor fwd
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
   
   // R motor fwd
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
 
   // Cutter on
   Serial.println("Cutter on");
@@ -38,11 +38,11 @@ void driveBackward() {
   analogWrite(dc, 255);
   
   // L motor rew
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
   // R motor rew
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
 }
 void driveStop() {
   Serial.println("Stop");

@@ -15,7 +15,7 @@ int currentCheckLM();
 int currentCheckRM();
 int currentCheckCM();
 int distanceFront();
-void turnAround();
+void turnAround(int ttime);
 void driveForward();
 void driveBackward();
 void driveStop();
@@ -100,18 +100,20 @@ void setup() {
 
   // Battery voltage
   pinMode(voltsens, INPUT);
-  //  battv = batt();       // Check
-
+  battv = batt();       // Check
+  Serial.print ("B: ");
+  Serial.print(battv/10);
+  Serial.println("V");
   // Set drive motor speed
   analogWrite(enA, driveSpeed);
   analogWrite(enB, driveSpeed);
-  driveForward();
-  delay(2000);
-  driveStop();
+  //driveForward();
+  //delay(2000);
+  //driveStop();
 
 
   Serial.begin (9600);
-  Serial.println("Welcome to Arduclip 2017 v0.1"); 
+  Serial.println("Welcome to Arduclip 2017 v0.2"); 
   Serial.println(instructions);
 
 }
@@ -122,9 +124,9 @@ void loop() {
       lastMsg = now;
       
       battv = batt(); 
-      Serial.print ("B: ");
-      Serial.print(battv/10);
-      Serial.println("V (in main)");
+      //Serial.print ("B: ");
+      //Serial.print(battv/10);
+      //Serial.println("V (in main)");
   
       if (battv/10 < 23) {
         driveStop();
@@ -132,37 +134,43 @@ void loop() {
         Serial.println("Batt low, power off");
         
       }
-      Serial.println(instructions);
+      //Serial.println(instructions);
   }
   // Check current
   int currentLM = currentCheckLM();
   int currentRM = currentCheckRM();
   int currentCM = currentCheckCM();
 
-  if (currentLM > 2 || currentRM > 2 || currentCM > 2){
+  if (currentLM > 2 || currentRM > 2 || currentCM > 5){
         driveStop();
-        analogWrite(dc, 255);   // Cutter off
-        
-        Serial.println("Current high, power off");
+        analogWrite(dc, 255);   // Cutter off      
+        if (currentLM > 2 || currentRM > 2) {
+          Serial.println("Drive motor current high");
+        }
+        else if (currentCM > 5) {
+          Serial.println("Cutter motor current high");
+        }
+        turnAround(1000);
   }
 
   // Are we close to something?
-  Serial.print ("distSensorEn: ");
-  Serial.println (distSensorEn);
+  //Serial.print ("distSensorEn: ");
+  //Serial.println (distSensorEn);
   if (distSensorEn) {
     int distance = distanceFront();
-    Serial.print("Distance: ");
-    Serial.println(distance);
-    if (distance <= 5){
-      turnAround();
+    //Serial.print("Distance: ");
+    //Serial.println(distance);
+    if (distance <= 10){
+      turnAround(1000);
+      Serial.println("Turning, obstacle");
     }
   }
 
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
       String serInput = Serial.readStringUntil('\n');
-        Serial.print("Got: ");
-        Serial.println(serInput);
+        //Serial.print("Got: ");
+        //Serial.println(serInput);
         // The first char is the command. This can be followed by a value
         String command = serInput.substring(0,1);
         //Serial.println(command);
