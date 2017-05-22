@@ -5,8 +5,9 @@
  */
 
 
-#include <Thread.h>   // Timing functions
-Thread battThread = Thread();
+//#include <Thread.h>   // Timing functions
+//Thread battThread = Thread();
+#include <Time.h>
 
 // Prototypes
 int batt();
@@ -27,9 +28,9 @@ int enA = 5;
 int in1 = 6;
 int in2 = 7;
 // Motor R
-int enB = 9;
+int enB = 10;// Bytt plats på 9 och 10
 int in3 = 8;
-int in4 = 10;
+int in4 = 9;
 
 // Cutter driver connection
 int dc = 3; 
@@ -56,23 +57,26 @@ int trigPin = 12; // Trigger Pin
 int maximumRange = 200; // Maximum range needed
 int minimumRange = 0; // Minimum range needed
 long duration, distance; // Duration used to calculate distance
+boolean distSensorEn = true;
+
 
 // Measure battery voltage
 int battv;  // Holds battery voltage value
 int batteryVoltage;
 // Input to pin A3
 int voltsens = 3;
-float vPow = 5.02; // Voltage at the Arduinos Vcc and Vref. 
-int r1 = 11000;  // "Top" resistor, 11k (10+1)
-int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm. 
+//float vPow = 5.02; // Voltage at the Arduinos Vcc and Vref. 
+//int r1 = 11000;  // "Top" resistor, 11k (10+1)
+//int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm. 
+
+long lastMsg = 0;
 
 int LEDPin = 13; // Onboard LED
 int redLed = 0; // CHECK THIS
 
+String instructions="1-forward, 2-back, 3-stop, 4nnn-Set speed to nnn, 5 -cutter on, 6 - cutter off, 7 - distSensorEn toggle";
+
 void setup() {
-  Serial.begin (9600);
-  Serial.println("Welcome to Arduclip 2017 v0.1"); 
-  Serial.println("1-forward, 2-back, 3-stop, 4nnn-Set speed to nnn, 5 -cutter on, 6 - cutter off");
   // Setup pins for motor drivers
   // set all the motor control pins to outputs
   pinMode(enA, OUTPUT);
@@ -83,6 +87,8 @@ void setup() {
   pinMode(in4, OUTPUT);
   pinMode(dc, OUTPUT);
 
+  delay(300);
+  
   // Cutter motor off
   cutterOff();
   // Drive motors off
@@ -94,22 +100,40 @@ void setup() {
 
   // Battery voltage
   pinMode(voltsens, INPUT);
-//  battv = batt();       // Check
+  //  battv = batt();       // Check
 
-  battThread.onRun(batt());
-  battThread.setInterval(5000);  
-  
   // Set drive motor speed
   analogWrite(enA, driveSpeed);
   analogWrite(enB, driveSpeed);
-  //driveMotors();
+  driveForward();
+  delay(2000);
+  driveStop();
+
+
+  Serial.begin (9600);
+  Serial.println("Welcome to Arduclip 2017 v0.1"); 
+  Serial.println(instructions);
+
 }
 
 void loop() {
-  // checks if thread should run
-  if(battThread.shouldRun())
-    battThread.run();
-
+  long now = millis();
+  if (now - lastMsg > 1000) {
+      lastMsg = now;
+      
+      battv = batt(); 
+      Serial.print ("B: ");
+      Serial.print(battv/10);
+      Serial.println("V (in main)");
+  
+      if (battv/10 < 23) {
+        driveStop();
+        analogWrite(dc, 255);   // Cutter off
+        Serial.println("Batt low, power off");
+        
+      }
+      Serial.println(instructions);
+  }
   // Check current
   int currentLM = currentCheckLM();
   int currentRM = currentCheckRM();
@@ -123,25 +147,17 @@ void loop() {
   }
 
   // Are we close to something?
-  int distance = distanceFront();
-  Serial.print("Distance: ");
-  Serial.println(distance);
-  if (distance <= 5){
-    turnAround();
+  Serial.print ("distSensorEn: ");
+  Serial.println (distSensorEn);
+  if (distSensorEn) {
+    int distance = distanceFront();
+    Serial.print("Distance: ");
+    Serial.println(distance);
+    if (distance <= 5){
+      turnAround();
+    }
   }
 
-  
-  Serial.print ("B: ");
-  Serial.print(battv);
-  Serial.println("V (in main)");
-  
-  if (battv < 23) {
-        driveStop();
-        analogWrite(dc, 255);   // Cutter off
-        Serial.println("Batt low, power off");
-        
-  }
-   
   // if there's any serial available, read it:
   while (Serial.available() > 0) {
       String serInput = Serial.readStringUntil('\n');
@@ -178,6 +194,10 @@ void loop() {
         else if (command=="6") {
           Serial.println("Cutter off");
           analogWrite(dc, 255);
+        }
+        else if (command=="7") {
+          Serial.println("Distance sensor toggle");
+          distSensorEn = !distSensorEn;
         }
   }
   delay(1200);

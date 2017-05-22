@@ -1,22 +1,26 @@
 int batt() {
+  // https://startingelectronics.org/articles/arduino/measuring-voltage-with-arduino/
+  
   int adcvalue = analogRead(voltsens);
-  Serial.print("Batt adc: ");
-  Serial.println(adcvalue);   // 143
-  int volt = (adcvalue * vPow*10) / 1024.0;   // Multiply by ten -> gives a 'decimal' with an int
-  // dc 130 -> volt = 6,38
-  int div = (r2 / (r1 + r2));
-  Serial.println(div);
-  int battv = volt / (r2 / (r1 + r2));
-  //Serial.print("Battery: ");
-  //Serial.print(volt2);
-  //Serial.println("V");
-
-  //Serial.print("COOL! I'm running on: ");
-  //Serial.println(millis());
-
-  Serial.print ("B: ");
+  
+  //Serial.print("Batt adc: ");
+  //Serial.println(adcvalue);   // 143
+    
+  float voltage= adcvalue * (5.0 / 1023.0); 
+  
+  //Serial.println(voltage);
+  
+  /* Volt meter reads 27,72
+     Code says 4,48
+     27,72/4,48 = 6,1875 
+  */
+  battv = voltage * 6.1875 * 10;  // Preserve one decimal with battv (is a Int)
+  
+  /*
+  Serial.print("battv: ");
   Serial.print(battv);
   Serial.println("V");
-
-  //return volt2;
+  */
+  
+  return battv;
 }
