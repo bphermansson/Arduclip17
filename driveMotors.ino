@@ -24,9 +24,10 @@
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
 
+  delay(300);
+
   // Cutter on
   Serial.println("Cutter on");
-  delay(100);
   analogWrite(dc, 0);
 
 }
@@ -54,6 +55,37 @@ void driveStop() {
   analogWrite(dc, 255);
   Serial.println("Cutter off");
 }
+
+void left() {
+  Serial.println("Left");
+   // Cutter off
+  analogWrite(dc, 255);
+  Serial.println("Cutter off");
+ 
+  // L motor rew
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  
+  // R motor fwd
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+}
+
+void right() {
+  Serial.println("Right");
+  // Cutter off
+  analogWrite(dc, 255);
+  Serial.println("Cutter off");
+
+  // L motor fwd
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, HIGH);
+  
+  // R motor rew
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+}
+
 void cutterOn(){
   // Cutter on
   pinMode(dc, OUTPUT);
@@ -62,7 +94,7 @@ void cutterOn(){
 }
 void cutterOff(){
   // Cutter off
-  pinMode(dc, INPUT);
+  // pinMode(dc, INPUT);
   analogWrite(dc, 255);
   Serial.println("Cutter off");
 }

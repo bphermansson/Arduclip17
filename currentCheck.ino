@@ -5,8 +5,8 @@ int currentCheckLM(){
  //Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsL = ((Voltage - ACSoffset) / mVperAmp);
- Serial.print("Amp motor L: ");
- Serial.println(AmpsL,3); // the '3' after voltage allows you to display 3 digits after decimal point
+ //Serial.print("Amp motor L: ");
+ //Serial.println(AmpsL,3); // the '3' after voltage allows you to display 3 digits after decimal point
  return AmpsL;
  delay(100);
 } 
@@ -18,8 +18,8 @@ int currentCheckRM(){
  //Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsR = ((Voltage - ACSoffset) / mVperAmp);
- Serial.print("Amp motor R: ");
- Serial.println(AmpsR,3);
+ //Serial.print("Amp motor R: ");
+ //Serial.println(AmpsR,3);
  return AmpsR;
  delay(100);
 }
@@ -30,8 +30,8 @@ int currentCheckCM(){
  //Serial.println(RawValue);
  Voltage = (RawValue / 1024.0) * 5000; // Gets you mV
  AmpsC = ((Voltage - ACSoffset) / mVperAmp);
- Serial.print("Amp cutter motor: ");
- Serial.println(AmpsC,3);
+ //Serial.print("Amp cutter motor: ");
+ //Serial.println(AmpsC,3);
  return AmpsC;
  delay(100);
 }

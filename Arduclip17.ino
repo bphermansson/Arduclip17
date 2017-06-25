@@ -7,7 +7,7 @@
 
 //#include <Thread.h>   // Timing functions
 //Thread battThread = Thread();
-#include <Time.h>
+//#include <Time.h>
 
 // Prototypes
 int batt();
@@ -21,6 +21,8 @@ void driveBackward();
 void driveStop();
 void cutterOn();
 void cutterOff();
+
+const char compile_date[] = __DATE__ " " __TIME__;
 
 // Connections for wheel motor drivers
 // Motor L
@@ -37,7 +39,7 @@ int dc = 3;
 int cutterSpeed = 255;  // This is connected via a inverting transistor, 255 is off
 
 // Initial drive motor speed
-int driveSpeed = 150;
+int driveSpeed = 120;
 
 // ACS712 for measuring motor current
 const int analogCutmotor = A0;
@@ -57,7 +59,7 @@ int trigPin = 12; // Trigger Pin
 int maximumRange = 200; // Maximum range needed
 int minimumRange = 0; // Minimum range needed
 long duration, distance; // Duration used to calculate distance
-boolean distSensorEn = true;
+boolean distSensorEn = false;
 
 
 // Measure battery voltage
@@ -70,27 +72,28 @@ int voltsens = 3;
 //int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm. 
 
 long lastMsg = 0;
+int randNumber;
 
 int LEDPin = 13; // Onboard LED
 int redLed = 0; // CHECK THIS
 
-String instructions="1-forward, 2-back, 3-stop, 4nnn-Set speed to nnn, 5 -cutter on, 6 - cutter off, 7 - distSensorEn toggle";
+String instructions="1-forward, 2-back, 3-stop, 4 - N/A, 5 -cutter on, 6 - cutter off, 7 - distSensorEn toggle, 8 - left, 9 - right, I - Faster, D - Slower";
 
 void setup() {
   // Setup pins for motor drivers
   // set all the motor control pins to outputs
+  pinMode(dc, OUTPUT);
+  // Cutter motor off
+  cutterOff();
+  
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
-  pinMode(dc, OUTPUT);
 
   delay(300);
-  
-  // Cutter motor off
-  cutterOff();
   // Drive motors off
   driveStop();
 
@@ -98,12 +101,7 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-  // Battery voltage
-  pinMode(voltsens, INPUT);
-  battv = batt();       // Check
-  Serial.print ("B: ");
-  Serial.print(battv/10);
-  Serial.println("V");
+
   // Set drive motor speed
   analogWrite(enA, driveSpeed);
   analogWrite(enB, driveSpeed);
@@ -111,11 +109,19 @@ void setup() {
   //delay(2000);
   //driveStop();
 
-
-  Serial.begin (9600);
+  randomSeed(analogRead(5));
+  
+  Serial.begin (115200);
   Serial.println("Welcome to Arduclip 2017 v0.2"); 
+  Serial.println(compile_date);
   Serial.println(instructions);
-
+  
+  // Battery voltage
+  pinMode(voltsens, INPUT);
+  battv = batt();       // Check
+  Serial.print ("B: ");
+  Serial.print(battv/10);
+  Serial.println("V");
 }
 
 void loop() {
@@ -131,7 +137,24 @@ void loop() {
       if (battv/10 < 23) {
         driveStop();
         analogWrite(dc, 255);   // Cutter off
-        Serial.println("Batt low, power off");
+        Serial.print ("B: ");
+        Serial.print(battv/10);
+        Serial.println("V");
+        Serial.println("Batt low");
+        // Make another measurement with motors off
+        delay(300);
+        battv = batt(); 
+        if (battv/10 < 23) {
+          // Still low
+          Serial.println("Batt low, power off");
+        }
+        else {
+          // Move on
+          analogWrite(dc, 0);   // Cutter on
+          delay(300);
+          driveForward();
+        }
+        
         
       }
       //Serial.println(instructions);
@@ -150,7 +173,8 @@ void loop() {
         else if (currentCM > 5) {
           Serial.println("Cutter motor current high");
         }
-        turnAround(1000);
+        turnAround(1500);
+        driveForward();
   }
 
   // Are we close to something?
@@ -161,52 +185,76 @@ void loop() {
     //Serial.print("Distance: ");
     //Serial.println(distance);
     if (distance <= 10){
-      turnAround(1000);
+      randNumber = random(1000, 2500);
+      turnAround(randNumber);
       Serial.println("Turning, obstacle");
+      driveForward();
+
     }
   }
 
   // if there's any serial available, read it:
-  while (Serial.available() > 0) {
+  while (Serial.available() ) {
       String serInput = Serial.readStringUntil('\n');
-        //Serial.print("Got: ");
-        //Serial.println(serInput);
-        // The first char is the command. This can be followed by a value
-        String command = serInput.substring(0,1);
-        //Serial.println(command);
+      //int serInput = Serial.read();
+      serInput.trim();  
+        // Debug
+        Serial.print("Got: -");
+        Serial.print(serInput);
+        Serial.println("-");
         
-        if (command=="1") {
+        if (serInput=="1") {
           Serial.println ("Forward");
           driveForward();
         }
-        else if (command=="2") {
+        else if (serInput=="2") {
           Serial.println ("Reverse");
           driveBackward();
         }
-        else if (command=="3") {
+        else if (serInput=="3") {
           Serial.println ("Stop");
           driveStop();
         }
-        else if (command=="4") {
-          Serial.println ("Set drive speed!");  
-          driveSpeed = serInput.substring(1).toInt();
-          Serial.print("New drive speed: ");
-          Serial.println(driveSpeed);  
-          analogWrite(enA, driveSpeed);
-          analogWrite(enB, driveSpeed);
+        else if (serInput=="4") {
+
         }  
-        else if (command=="5") {
+        else if (serInput=="5") {
           Serial.print("Cutter on ");
           analogWrite(dc, 0);
         }
-        else if (command=="6") {
+        else if (serInput=="6") {
           Serial.println("Cutter off");
           analogWrite(dc, 255);
         }
-        else if (command=="7") {
+        else if (serInput=="7") {
           Serial.println("Distance sensor toggle");
           distSensorEn = !distSensorEn;
         }
+        else if (serInput=="8") {
+          left();
+        }
+        else if (serInput=="9") {
+          right();
+        }
+        else if (serInput=="I") {
+          driveSpeed=driveSpeed+10;
+          if (driveSpeed>=250) {
+            driveSpeed=250;
+          }
+          Serial.print("New drive speed is: ");
+          Serial.println(driveSpeed);
+        }
+        else if (serInput=="D") {
+          driveSpeed=driveSpeed-10;
+          if (driveSpeed<=80) {
+            driveSpeed=80;
+          }
+          Serial.print("New drive speed is: ");
+          Serial.println(driveSpeed);
+        }
+        
   }
   delay(1000);
+            //Serial.println("Loop");
+
 }
