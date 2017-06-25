@@ -1,9 +1,8 @@
 #include <Arduino.h>
 
 void turnAround(int ttime) {
-  Serial.println("Turn around");
   int oldSpeed = driveSpeed;
-  
+
   // Set speed
   analogWrite(enA, 120);
   analogWrite(enB, 120);
@@ -20,13 +19,32 @@ void turnAround(int ttime) {
   driveStop();
   delay(500);
 
-  // L motor fwd
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  
-  // R motor rew
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  // Turn left or right?
+  randNumber = random(1, 10);
+  if (randNumber<5) {
+    Serial.println("Turn left");
+
+    // L motor fwd
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    
+    // R motor rew
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+
+  }
+  else {
+    Serial.println("Turn right");
+
+    // L motor fwd
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+
+    // R motor rew
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+
+  }
 
   delay(ttime);
   driveStop();
