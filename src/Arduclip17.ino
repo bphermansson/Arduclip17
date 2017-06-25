@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /* Red led for error indication
  * Check value for batt low
  * 

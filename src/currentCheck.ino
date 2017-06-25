@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 int currentCheckLM(){
  // Left motor
  RawValue = analogRead(analogDrivemotorL);

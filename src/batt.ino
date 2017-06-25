@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 int batt() {
   // https://startingelectronics.org/articles/arduino/measuring-voltage-with-arduino/
   
