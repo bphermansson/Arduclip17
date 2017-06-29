@@ -2,8 +2,8 @@
 
 /* Red led for error indication
  * Check value for batt low
- * 
- * 
+ *
+ *
  */
 
 
@@ -37,7 +37,7 @@ int in3 = 8;
 int in4 = 9;
 
 // Cutter driver connection
-int dc = 3; 
+int dc = 3;
 int cutterSpeed = 255;  // This is connected via a inverting transistor, 255 is off
 
 // Initial drive motor speed
@@ -49,14 +49,14 @@ const int analogDrivemotorL = A1; // Check this!!!
 const int analogDrivemotorR = A2;
 int mVperAmp = 185; // use 100 for 20A Module and 66 for 30A Module
 int RawValue= 0;
-int ACSoffset = 2500; 
+int ACSoffset = 2500;
 double Voltage = 0;
 double AmpsL = 0;
 double AmpsR = 0;
 double AmpsC = 0;
 
 // HC-SR04 distance sensor
-int echoPin = 11; // Echo Pin     
+int echoPin = 11; // Echo Pin
 int trigPin = 12; // Trigger Pin
 int maximumRange = 200; // Maximum range needed
 int minimumRange = 0; // Minimum range needed
@@ -69,15 +69,16 @@ int battv;  // Holds battery voltage value
 int batteryVoltage;
 // Input to pin A3
 int voltsens = 3;
-//float vPow = 5.02; // Voltage at the Arduinos Vcc and Vref. 
+//float vPow = 5.02; // Voltage at the Arduinos Vcc and Vref.
 //int r1 = 11000;  // "Top" resistor, 11k (10+1)
-//int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm. 
+//int r2 = 2200;   // "Bottom" resistor (to ground), 2.2 kohm.
 
 long lastMsg = 0;
 int randNumber;
 
 int LEDPin = 13; // Onboard LED
-int redLed = 0; // CHECK THIS
+int redLed = 2;
+int redLed = 4;
 
 String instructions="1-forward, 2-back, 3-stop, 4 - N/A, 5 -cutter on, 6 - cutter off, 7 - distSensorEn toggle, 8 - left, 9 - right, I - Faster, D - Slower";
 
@@ -87,7 +88,7 @@ void setup() {
   pinMode(dc, OUTPUT);
   // Cutter motor off
   cutterOff();
-  
+
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
   pinMode(in1, OUTPUT);
@@ -112,12 +113,12 @@ void setup() {
   //driveStop();
 
   randomSeed(analogRead(5));
-  
+
   Serial.begin (115200);
-  Serial.println("Welcome to Arduclip 2017 v0.2"); 
+  Serial.println("Welcome to Arduclip 2017 v0.2");
   Serial.println(compile_date);
   Serial.println(instructions);
-  
+
   // Battery voltage
   pinMode(voltsens, INPUT);
   battv = batt();       // Check
@@ -130,12 +131,12 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 1000) {
       lastMsg = now;
-      
-      battv = batt(); 
+
+      battv = batt();
       //Serial.print ("B: ");
       //Serial.print(battv/10);
       //Serial.println("V (in main)");
-  
+
       if (battv/10 < 23) {
         driveStop();
         analogWrite(dc, 255);   // Cutter off
@@ -145,7 +146,7 @@ void loop() {
         Serial.println("Batt low");
         // Make another measurement with motors off
         delay(300);
-        battv = batt(); 
+        battv = batt();
         if (battv/10 < 23) {
           // Still low
           Serial.println("Batt low, power off");
@@ -156,8 +157,8 @@ void loop() {
           delay(300);
           driveForward();
         }
-        
-        
+
+
       }
       //Serial.println(instructions);
   }
@@ -168,7 +169,7 @@ void loop() {
 
   if (currentLM > 2 || currentRM > 2 || currentCM > 5){
         driveStop();
-        analogWrite(dc, 255);   // Cutter off      
+        analogWrite(dc, 255);   // Cutter off
         if (currentLM > 2 || currentRM > 2) {
           Serial.println("Drive motor current high");
         }
@@ -199,12 +200,12 @@ void loop() {
   while (Serial.available() ) {
       String serInput = Serial.readStringUntil('\n');
       //int serInput = Serial.read();
-      serInput.trim();  
+      serInput.trim();
         // Debug
         Serial.print("Got: -");
         Serial.print(serInput);
         Serial.println("-");
-        
+
         if (serInput=="1") {
           Serial.println ("Forward");
           driveForward();
@@ -219,7 +220,7 @@ void loop() {
         }
         else if (serInput=="4") {
 
-        }  
+        }
         else if (serInput=="5") {
           Serial.print("Cutter on ");
           analogWrite(dc, 0);
@@ -254,7 +255,7 @@ void loop() {
           Serial.print("New drive speed is: ");
           Serial.println(driveSpeed);
         }
-        
+
   }
   delay(1000);
             //Serial.println("Loop");

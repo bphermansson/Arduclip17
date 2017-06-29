@@ -1,0 +1,2 @@
+#avrdude -DV -patmega168 -Pnet:192.168.1.130:23 -carduino -b115200 -U  flash:w:/tmp/arduino_build_385154/Arduclip17.ino.hex:i
+avrdude -DV -patmega168 -Pnet:192.168.1.130:23 -carduino -b115200 -U flash:w:.pioenvs/diecimilaatmega168/firmware.hex:i
