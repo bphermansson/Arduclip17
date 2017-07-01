@@ -61,8 +61,7 @@ int trigPin = 12; // Trigger Pin
 int maximumRange = 200; // Maximum range needed
 int minimumRange = 0; // Minimum range needed
 long duration, distance; // Duration used to calculate distance
-boolean distSensorEn = false;
-
+boolean distSensorEn = true;
 
 // Measure battery voltage
 int battv;  // Holds battery voltage value
@@ -77,7 +76,7 @@ long lastMsg = 0;
 int randNumber;
 
 int LEDPin = 13; // Onboard LED
-int redLed = 2;
+int greenLed = 2;
 int redLed = 4;
 
 String instructions="1-forward, 2-back, 3-stop, 4 - N/A, 5 -cutter on, 6 - cutter off, 7 - distSensorEn toggle, 8 - left, 9 - right, I - Faster, D - Slower";
@@ -153,12 +152,8 @@ void loop() {
         }
         else {
           // Move on
-          analogWrite(dc, 0);   // Cutter on
-          delay(300);
           driveForward();
         }
-
-
       }
       //Serial.println(instructions);
   }
@@ -167,17 +162,46 @@ void loop() {
   int currentRM = currentCheckRM();
   int currentCM = currentCheckCM();
 
-  if (currentLM > 2 || currentRM > 2 || currentCM > 5){
-        driveStop();
-        analogWrite(dc, 255);   // Cutter off
+  if (currentLM > 2 || currentRM > 2 || currentCM > 10){
         if (currentLM > 2 || currentRM > 2) {
           Serial.println("Drive motor current high");
+          // Wait and see if its temporary
+          delay(500);
+          // Measure again
+          int currentLM = currentCheckLM();
+          int currentRM = currentCheckRM();
+          if (currentLM > 2 || currentRM > 2) {
+            Serial.println("Drive motor current still high");
+            driveStop();
+            // Turn around and drive on
+            randNumber = random(1000, 2500);
+            turnAround(randNumber);
+            driveForward();
+          }
+          else {
+            // It was temporary high load
+            driveForward();
+          }
         }
-        else if (currentCM > 5) {
+        else if (currentCM > 10) {
           Serial.println("Cutter motor current high");
-        }
-        turnAround(1500);
-        driveForward();
+          // Wait and see if its temporary
+          delay(500);
+          int currentCM = currentCheckCM();
+          if (currentCM > 10) {
+            // Still high
+            driveStop();
+            // Turn around and drive on
+            randNumber = random(1000, 2500);
+            turnAround(randNumber);
+            driveForward();
+          }
+          else {
+            // It was temporary high load
+            driveForward();
+          }
+        //driveForward();
+      }
   }
 
   // Are we close to something?
