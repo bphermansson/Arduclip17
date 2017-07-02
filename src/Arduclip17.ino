@@ -95,7 +95,7 @@ void setup() {
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
 
-  delay(300);
+  delay(100);
   // Drive motors off
   driveStop();
 
@@ -103,7 +103,10 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 
-
+  pinMode(greenLed, OUTPUT);
+  pinMode(redLed, OUTPUT);
+  digitalWrite(greenLed, HIGH); // Power on
+  digitalWrite(redLed, HIGH);   // Test red led, off at end of setup
   // Set drive motor speed
   analogWrite(enA, driveSpeed);
   analogWrite(enB, driveSpeed);
@@ -124,6 +127,10 @@ void setup() {
   Serial.print ("B: ");
   Serial.print(battv/10);
   Serial.println("V");
+
+  delay(300);
+  digitalWrite(redLed, LOW);
+
 }
 
 void loop() {
