@@ -144,6 +144,7 @@ void loop() {
       //Serial.println("V (in main)");
 
       if (battv/10 < 23) {
+        digitalWrite(redLed, HIGH);
         driveStop();
         analogWrite(dc, 255);   // Cutter off
         Serial.print ("B: ");
@@ -159,6 +160,7 @@ void loop() {
         }
         else {
           // Move on
+          digitalWrite(redLed, LOW);
           driveForward();
         }
       }
@@ -170,6 +172,7 @@ void loop() {
   int currentCM = currentCheckCM();
 
   if (currentLM > 2 || currentRM > 2 || currentCM > 10){
+        digitalWrite(redLed, HIGH);
         if (currentLM > 2 || currentRM > 2) {
           Serial.println("Drive motor current high");
           // Wait and see if its temporary
@@ -183,10 +186,12 @@ void loop() {
             // Turn around and drive on
             randNumber = random(1000, 2500);
             turnAround(randNumber);
+            digitalWrite(redLed, LOW);
             driveForward();
           }
           else {
             // It was temporary high load
+            digitalWrite(redLed, LOW);
             driveForward();
           }
         }
@@ -201,10 +206,12 @@ void loop() {
             // Turn around and drive on
             randNumber = random(1000, 2500);
             turnAround(randNumber);
+            digitalWrite(redLed, LOW);
             driveForward();
           }
           else {
             // It was temporary high load
+            digitalWrite(redLed, LOW);
             driveForward();
           }
         //driveForward();
@@ -219,9 +226,11 @@ void loop() {
     //Serial.print("Distance: ");
     //Serial.println(distance);
     if (distance <= 10){
+      digitalWrite(redLed, HIGH);
       randNumber = random(1000, 2500);
       turnAround(randNumber);
       Serial.println("Turning, obstacle");
+      digitalWrite(redLed, LOW); 
       driveForward();
 
     }
