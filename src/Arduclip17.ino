@@ -171,20 +171,20 @@ void loop() {
   int currentRM = currentCheckRM();
   int currentCM = currentCheckCM();
 
-  if (currentLM > 2 || currentRM > 2 || currentCM > 10){
+  if (currentLM > 3 || currentRM > 3 || currentCM > 10){
         digitalWrite(redLed, HIGH);
-        if (currentLM > 2 || currentRM > 2) {
+        if (currentLM > 3 || currentRM > 3) {
           Serial.println("Drive motor current high");
           // Wait and see if its temporary
           delay(500);
           // Measure again
           int currentLM = currentCheckLM();
           int currentRM = currentCheckRM();
-          if (currentLM > 2 || currentRM > 2) {
+          if (currentLM > 3 || currentRM > 3) {
             Serial.println("Drive motor current still high");
             driveStop();
             // Turn around and drive on
-            randNumber = random(1000, 2500);
+            randNumber = random(2000, 3500);
             turnAround(randNumber);
             digitalWrite(redLed, LOW);
             driveForward();
@@ -204,7 +204,7 @@ void loop() {
             // Still high
             driveStop();
             // Turn around and drive on
-            randNumber = random(1000, 2500);
+            randNumber = random(2000, 3500);
             turnAround(randNumber);
             digitalWrite(redLed, LOW);
             driveForward();
@@ -230,7 +230,7 @@ void loop() {
       randNumber = random(1000, 2500);
       turnAround(randNumber);
       Serial.println("Turning, obstacle");
-      digitalWrite(redLed, LOW); 
+      digitalWrite(redLed, LOW);
       driveForward();
 
     }
